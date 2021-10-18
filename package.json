@@ -1,0 +1,30 @@
+{
+  "name": "vite-plugin-amd",
+  "version": "0.0.0",
+  "description": "vite app build into AMD moudle",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linsk1998/vite-plugin-amd.git"
+  },
+  "keywords": [
+    "vite",
+    "plugin",
+    "amd",
+    "requirejs",
+    "module",
+    "compat"
+  ],
+  "author": "linsk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/linsk1998/vite-plugin-amd/issues"
+  },
+  "homepage": "https://github.com/linsk1998/vite-plugin-amd#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10"
+  }
+}
