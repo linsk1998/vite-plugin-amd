@@ -1,11 +1,67 @@
 const cheerio = require('cheerio');
 
+const preloadHelperId = 'vite/preload-helper';
+const preloadMethod = `__vitePreload`;
 
+function preload(baseModule, deps){
+	if (!deps || deps.length === 0) {
+		return baseModule()
+	}
+	var rdeps=[];
+	var links = document.getElementsByTagName("LINK");
+	var ps=[];
+	deps.forEach(function(dep) {
+		// @ts-ignore
+		dep = base + dep;
+		// @ts-ignore
+		if (Object.prototype.hasOwnProperty.call(seen,dep)) return;
+		// @ts-ignore
+		seen[dep] = true;
+		var isCss = dep.endsWith('.css');
+		// @ts-ignore check if the file is already preloaded by SSR markup
+		var link;
+		var i = links.length;
+		while(i-->0){
+			link = links[i];
+			if(link.href == dep && link.rel=="stylesheet"){
+				return ;
+			}
+		}
+		if (isCss) {
+			// @ts-ignore
+			link = document.createElement('link');
+			// @ts-ignore
+			link.rel = 'stylesheet';
+			link.href = dep;
+			// @ts-ignore
+			// document.head.appendChild(link);
+			// ps.push( new Promise(function(res, rej) {
+			// 	link.onload = function(){
+			// 		res(this);
+			// 	};
+			// 	link.onerror = function(message){
+			// 		rej(new Error(message));
+			// 	};
+			// }));
+		}else{
+			rdeps.push(dep);
+		}
+	});
+	if(rdeps){
+		ps.push(new Promise(function(resolve,reject){
+			require(rdeps,resolve,reject);
+		}));
+	}
+	return Promise.all(rdeps).then(baseModule);
+};
 function amd(options) {
 	if (!options) options = {};
-	var requirejs = options.requirejs || "https://cdn.bootcdn.net/ajax/libs/require.js/2.3.6/require.min.js";
+	var requirejs = options.requirejs;
+	let config;
 	return {
 		name: 'amd',
+		enforce: 'pre',
+		apply: 'build',
 		config(config, { command }) {
 			if (command === 'build') {
 				//console.log(config);
@@ -46,16 +102,31 @@ function amd(options) {
 					$(this).remove();
 				}
 			});
-			$('head').append(
-				$('<script></script>').attr('src', requirejs)
-			);
+			if(requirejs){
+				$('head').append(
+					$('<script></script>').attr('src', requirejs)
+				);
+			}
 			$('head').append(
 				$('<script></script>').html(`require(${JSON.stringify(entries)})`)
 			);
 			return $.html();
 		},
-		apply: 'build'
+		configResolved(_config) {
+			config = _config;
+		},
+		load(id) {
+			Promise.resolve();
+			if (id === preloadHelperId) {
+				return `
+var seen = {};
+var base = '${config.base}';
+export var ${preloadMethod}=${preload.toString()};
+				`;
+			}
+		}
 	}
 }
+
 amd.default = amd;
 module.exports = amd;
