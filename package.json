@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-amd",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "vite app build into AMD moudle",
   "main": "index.js",
   "scripts": {

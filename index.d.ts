@@ -4,6 +4,7 @@ declare module "vite-plugin-amd" {
 		freeze?: boolean;
 		strict?: boolean;
 		interop?: boolean;
+		config?:any
 	}
 	export default function plugin(option?: PluginOptions): any;
 }

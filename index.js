@@ -107,8 +107,17 @@ function amd(options) {
 					$('<script></script>').attr('src', requirejs)
 				);
 			}
+			var requirejsConfig=options.config;
+			if(requirejsConfig){
+				if(typeof requirejsConfig!=="string"){
+					requirejsConfig=JSON.stringify(requirejsConfig)
+				}
+				$('head').append(
+					$('<script></script>').html(`require.config(${requirejsConfig});`)
+				);
+			}
 			$('head').append(
-				$('<script></script>').html(`require(${JSON.stringify(entries)})`)
+				$('<script></script>').html(`require(${JSON.stringify(entries)});`)
 			);
 			return $.html();
 		},
